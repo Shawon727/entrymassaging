@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#070b14" />
+  <meta name="description" content="HSC 2027 Prep + Private Chat" />
+  <title>HSC 2027 Prep</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>" />
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <!-- ROLE / CODE SCREEN -->
+  <div id="role-screen" class="screen active">
+    <div class="role-card glass">
+      <div class="logo-wrap">
+        <div class="logo">💙</div>
+        <div class="logo-ring"></div>
+      </div>
+      <h1>Shawon AI</h1>
+      <p class="subtitle">Private real-time • HSC 2027 ready</p>
+
+      <div class="room-input-box">
+        <label>Shared Code</label>
+        <input type="text" id="room-code" placeholder="same code for both" value="shawonlove" maxlength="24" spellcheck="false" />
+      </div>
+
+      <div class="room-input-box">
+        <label>Your Access Code</label>
+        <input type="password" id="access-code" placeholder="Enter your code" maxlength="6" inputmode="numeric" />
+        <p class="hint-text">100 = Shawon &nbsp;•&nbsp; 02 = Partner</p>
+      </div>
+      
+      <button class="enter-btn" onclick="enterWithCode()">Enter</button>
+    </div>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="chat-screen" class="screen">
+    <header class="chat-header glass">
+      <div class="header-left">
+        <div class="avatar" id="partner-avatar">💙</div>
+        <div class="header-info">
+          <div class="name" id="partner-name">Shawon AI</div>
+          <div class="status">
+            <span class="dot" id="status-dot"></span>
+            <span id="status-text">Connecting...</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn study-btn" onclick="enterStudyMode()" title="Study Mode">📚</button>
+        <button class="icon-btn" id="export-btn" onclick="exportChat()" title="Export">📤</button>
+        <button class="icon-btn" id="ai-btn" onclick="toggleAI()" title="AI">🤖</button>
+        <button class="icon-btn danger" onclick="clearMyChat()" title="Clear">🗑️</button>
+      </div>
+    </header>
+
+    <div class="messages" id="messages"></div>
+
+    <div class="typing-indicator" id="typing" style="display:none;">
+      <div class="typing-dots"><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="media-preview" id="media-preview" style="display:none;">
+      <img id="preview-img" alt="preview" />
+      <button type="button" class="remove-media" onclick="removeMedia()">✕</button>
+    </div>
+
+    <form class="input-area glass" id="chat-form">
+      <button type="button" class="emoji-btn" onclick="toggleEmoji()">😊</button>
+      <label class="attach-btn" title="Photo / Video">
+        📎
+        <input type="file" id="media-input" accept="image/*,video/*" hidden />
+      </label>
+      <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" enterkeyhint="send" />
+      <button type="submit" class="send-btn" aria-label="Send">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </form>
+
+    <div class="emoji-picker glass" id="emoji-picker" style="display:none;">
+      <span onclick="addEmoji('❤️')">❤️</span>
+      <span onclick="addEmoji('😘')">😘</span>
+      <span onclick="addEmoji('😍')">😍</span>
+      <span onclick="addEmoji('🥰')">🥰</span>
+      <span onclick="addEmoji('😊')">😊</span>
+      <span onclick="addEmoji('😂')">😂</span>
+      <span onclick="addEmoji('🥺')">🥺</span>
+      <span onclick="addEmoji('💙')">💙</span>
+      <span onclick="addEmoji('🔥')">🔥</span>
+      <span onclick="addEmoji('✨')">✨</span>
+      <span onclick="addEmoji('🌙')">🌙</span>
+      <span onclick="addEmoji('💕')">💕</span>
+    </div>
+  </div>
+
+  <!-- STUDY MODE -->
+  <div id="study-screen" class="screen">
+    <header class="study-header">
+      <div class="study-brand">
+        <span class="study-logo">📚</span>
+        <div>
+          <div class="study-title">HSC 2027 Prep</div>
+          <div class="study-sub">Bangladesh • Science</div>
+        </div>
+      </div>
+      <div class="study-progress-ring" title="Tap 3 times to exit">
+        <svg viewBox="0 0 36 36">
+          <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+          <path class="ring-fill" stroke-dasharray="74, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+        </svg>
+        <span>74%</span>
+      </div>
+    </header>
+
+    <div class="study-tabs">
+      <button class="study-tab active" data-tab="physics" onclick="switchStudyTab(this)">Physics</button>
+      <button class="study-tab" data-tab="chemistry" onclick="switchStudyTab(this)">Chemistry</button>
+      <button class="study-tab" data-tab="biology" onclick="switchStudyTab(this)">Biology</button>
+      <button class="study-tab" data-tab="math" onclick="switchStudyTab(this)">Math</button>
+    </div>
+
+    <div class="study-content" id="study-content"></div>
+
+    <div class="study-footer">
+      <div class="study-stat"><span class="stat-num">6h 40m</span><span class="stat-label">Today</span></div>
+      <div class="study-stat"><span class="stat-num">186</span><span class="stat-label">Cards</span></div>
+      <div class="study-stat"><span class="stat-num">HSC</span><span class="stat-label">2027</span></div>
+    </div>
+    <div class="secret-hint" id="secret-hint">Tap progress 3× to exit</div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
